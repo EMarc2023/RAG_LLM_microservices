@@ -72,7 +72,7 @@ This codebase was developed with several key production-grade features and engin
 
 1.  **Clone the repository:**
     ```bash
-    git clone [Your-Repo-URL]
+    git clone https://github.com/EMarc2023/Mini_RAG_pipeline.git
     cd mini-rag-pipeline
     ```
 2.  **Create and fill `.env`:** Copy `.env.example` to `.env` and fill in your actual `API_KEY` and other necessary environment variables.
