@@ -1,0 +1,21 @@
+# Python Caches and Virtual Environments
+__pycache__
+*.pyc
+venv/
+wsl_venv/
+dlenv/
+
+# Secrets and Logs
+.env
+*.log
+
+# Testing & Artifacts
+.pytest_cache/
+test_rag_api.py   # No need for tests in the final production image
+#sample_data.jsonl # If you bake the data into the image, remove this line.
+                  # If you mount the data at runtime (better practice), keep this line.
+                  # For now, let's assume we bake the data in since it's small. 
+
+# Git
+.git
+.gitignore
