@@ -8,6 +8,40 @@ This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)*
 
 The core function is to allow users to submit queries against a pre-loaded knowledge base and retrieve contextually grounded answers, ensuring minimal hallucinations and providing verifiable sources.
 
+## 🏗️ Codebase Structure
+
+The project follows a standard structure for FastAPI applications:
+
+```mermaid
+graph TD
+    A[mini-rag-pipeline/] --> B[.github/];
+    B --> C[workflows/];
+    C --> D[ci_cd.yml];
+    A --> E[app.py];
+    A --> F[Dockerfile];
+    A --> G[requirements.txt];
+    A --> H[test_rag_api.py];
+    A --> I[.env.example];
+    A --> J[README.md];
+
+    style A fill:#f9f,stroke:#333
+    style D fill:#ddf,stroke:#333
+    style E fill:#ddf,stroke:#333
+    style F fill:#ddf,stroke:#333
+    style G fill:#ddf,stroke:#333
+    style H fill:#ddf,stroke:#333
+    style I fill:#ddf,stroke:#333
+    style J fill:#ddf,stroke:#333
+
+    click D "GitHub Actions workflow for test, lint, and artifact generation"
+    click E "Main FastAPI application and routing logic"
+    click F "Container image definition"
+    click G "Production dependencies list"
+    click H "Pytest unit tests for API endpoints"
+    click I "Example file for environment variables"
+    click J "Project documentation"
+```
+
 ## ✨ Production-Grade Features
 
 This codebase was developed with several key production-grade features and engineering considerations in mind:
@@ -54,3 +88,4 @@ Run the API using Uvicorn, passing the environment variables:
 ```bash
 # Set your actual API Key and run the server
 API_KEY="SECRET_TEST_KEY_123" uvicorn app:app --host 0.0.0.0 --port 8000
+
