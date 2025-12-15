@@ -7,7 +7,6 @@ httpx
 # Configuration
 pydantic-settings
 # LLM & Embeddings Stack
-torch
 numpy # Added explicitly for safety
 transformers
 accelerate
