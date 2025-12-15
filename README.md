@@ -108,7 +108,7 @@ Deployment Process (Using the Artifact)
 2. Transfer: Copy the .tar file to your target production server.
 3. Load: Load the image into the server's Docker registry:
    ```bash
-   Bashdocker load -i rag-api-v1.tar
+   docker load -i rag-api-v1.tar
    ```
 5. Run: Start the service, passing the production API key:Bashdocker run -d \
    ```bash
@@ -146,3 +146,28 @@ graph TD
 | **Request Throughput** | Implement a task queue system (e.g., **Celery** with **Redis** or **RabbitMQ**) for asynchronous processing of long-running RAG queries, moving them out of the FastAPI worker thread. |
 | **Observability** | Integrate distributed tracing (e.g., using **OpenTelemetry** or **LangSmith**) to monitor the performance of each RAG component (embedding, retrieval, generation) in production. |
 | **Knowledge Base Updates** | Create a separate, scheduled CI/CD job to rebuild the vector store index nightly and push the updated index to S3 or a managed vector store. |
+
+
+## 💻 Advanced Engineering Considerations
+To ensure this RAG pipeline is truly production-grade, we applied the following architectural principles:
+
+1. Telemetry (Observability)
+Purpose: To monitor the health, performance, and behavior of the RAG pipeline in production.
+
+Strategy: Implement OpenTelemetry (OTel) instrumentation (for Traces, Metrics, and Logs). This is critical for RAG to profile where latency occurs (e.g., is it the embedding model loading, the vector search, or the final LLM call?). Structured logging should be used to link error messages directly to specific request traces.
+
+2. Lifespan on FastAPI
+Purpose: Efficiently manage application resources.
+
+Strategy: Use the lifespan parameter with an async context manager (@asynccontextmanager) instead of legacy startup/shutdown events.
+
+Startup (Before yield): Load expensive, shared resources once, such as the Sentence Transformer model and the FAISS Vector Store. This guarantees the resources are ready before the first request and shared across all workers.
+
+Shutdown (After yield): Perform graceful cleanup, like closing database connections or releasing memory.
+
+3. Sync vs. Async (The ML Concurrency Rule)
+FastAPI's Strength: Asynchronous (async def) is ideal for I/O-Bound tasks (waiting for external APIs/DBs), allowing high concurrency.
+
+ML's Challenge: Local RAG component execution (embedding generation, local LLM inference) is CPU-Bound (heavy computation).
+
+Best Practice: The functions that execute the heavy ML inference should be defined as standard def functions. FastAPI automatically detects this and offloads the work to an internal thread pool, preventing the CPU-intensive task from blocking the main asynchronous event loop. This ensures the API remains responsive to new requests while computation is running.
