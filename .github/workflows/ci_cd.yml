@@ -48,22 +48,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1. Build the image locally
+      # 🚨 NEW CRITICAL STEP: Free up disk space before Docker operations
+      - name: Aggressive Runner Disk Cleanup
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          
+          # Remove large, unneeded pre-installed software
+          sudo rm -rf /usr/share/dotnet # .NET SDKs (~2 GB)
+          sudo rm -rf /usr/local/lib/android # Android SDKs (~9 GB)
+          sudo rm -rf /opt/hostedtoolcache # Cached tools (e.g., Node, Go, Python) (~8 GB)
+          sudo rm -rf /usr/share/swift # Swift toolchain
+          sudo rm -rf /opt/ghc # Haskell GHC
+          
+          echo "Disk space after cleanup:"
+          df -h
+          
+      # 1. Build the image locally (Previous step 1)
       - name: Build Docker image
-        # This uses the standard Docker CLI commands available on the runner
         run: |
           docker build -t rag-api:v1 .
 
-      # 2. Save the image to a tar file (the artifact)
+      # 2. Save the image to a tar file (Previous step 2)
       - name: Save Docker image to tar
-        # The docker save command exports the image to a single file
         run: |
           docker save -o rag-api-v1.tar rag-api:v1
       
-      # 3. Upload the tar file as a GitHub Artifact
+      # 3. Upload the tar file as a GitHub Artifact (Previous step 3)
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:
           name: rag-api-v1-docker-image
           path: rag-api-v1.tar
-          retention-days: 30 # Optional: Sets how long the artifact is retained
+          retention-days: 7
