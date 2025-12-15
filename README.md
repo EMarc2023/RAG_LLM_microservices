@@ -1,5 +1,7 @@
 # 📖 Mini RAG Pipeline: Production-Grade Retrieval-Augmented Generation (RAG) API
 
+[![Python CI/CD](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd.yml)
+
 ## 🚀 Overview
 
 This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)** pipeline implemented as a RESTful API using **FastAPI**. It is designed for high performance, reliability, and enterprise scalability, leveraging established Python libraries like PyTorch (CPU-only), HuggingFace Transformers, and LangChain components.
