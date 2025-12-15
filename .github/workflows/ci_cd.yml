@@ -39,3 +39,31 @@ jobs:
         echo "API_KEY=SECRET_TEST_KEY_123" >> .env
         echo "OTEL_SERVICE_NAME=CI-Test-RAG" >> .env
         pytest -v
+        
+  docker-artifact:
+    needs: build  # This job runs only if the 'build' (test) job succeeds
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1. Build the image locally
+      - name: Build Docker image
+        # This uses the standard Docker CLI commands available on the runner
+        run: |
+          docker build -t rag-api:v1 .
+
+      # 2. Save the image to a tar file (the artifact)
+      - name: Save Docker image to tar
+        # The docker save command exports the image to a single file
+        run: |
+          docker save -o rag-api-v1.tar rag-api:v1
+      
+      # 3. Upload the tar file as a GitHub Artifact
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rag-api-v1-docker-image
+          path: rag-api-v1.tar
+          retention-days: 30 # Optional: Sets how long the artifact is retained
