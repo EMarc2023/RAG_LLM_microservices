@@ -17,14 +17,13 @@ jobs:
         python-version: '3.10'
 
     # 1. Install dependencies
-    - name: Install dependencies
+
+    - name: Install dependencies (CPU-Only PyTorch Fix)
       run: |
         pip install --upgrade pip
-        # Install all dependencies *except* torch, which will be handled below.
-        pip install -r requirements.txt
-
-        # Force CPU-only PyTorch installation
-        pip install torch --index-url https://download.pytorch.org/whl/cpu
+        # CRITICAL FIX: Use a single installation command and include the CPU index URL.
+        # This tells pip to look at the PyTorch CPU index IN ADDITION to the main PyPI index.
+        pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
     # 2. Run Linting & Formatting Checks
     - name: Run Black & Flake8 checks
