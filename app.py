@@ -12,6 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Telemetry
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
+
 # flake8: noqa: E501
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
@@ -38,6 +39,7 @@ class Settings(BaseSettings):
 
     api_key: str
     otel_service_name: str = "Mini-RAG-API"
+
 
 # Instantiate the settings object globally
 settings = Settings()
@@ -102,7 +104,7 @@ class RAGPipeline:
     # Iterator for batching
     def _batch_iterator(self, items: List[str], batch_size: int):
         for i in range(0, len(items), batch_size):
-            yield items[i:i+batch_size]
+            yield items[i : i + batch_size]
 
     # Async generator for retrieval
     async def retrieve_generator(self, query: str, top_k: int = 2):

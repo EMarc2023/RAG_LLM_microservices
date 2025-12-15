@@ -9,11 +9,17 @@ from app import app, RAGPipeline, verify_api_key, rag_resources
 SAMPLE_FILE = "sample_data.jsonl"
 SAMPLE_DOCS = [
     # flake8: noqa: E501
-    {"text": "FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python typehints."},
+    {
+        "text": "FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python typehints."
+    },
     # flake8: noqa: E501
-    {"text": "FAISS is a library for efficient similarity search and clustering of dense vectors."},
+    {
+        "text": "FAISS is a library for efficient similarity search and clustering of dense vectors."
+    },
     # flake8: noqa: E501
-    {"text": "Embedding models turn text into numerical vectors that capture semantic meaning."},
+    {
+        "text": "Embedding models turn text into numerical vectors that capture semantic meaning."
+    },
 ]
 
 # Write the sample data to JSONL
