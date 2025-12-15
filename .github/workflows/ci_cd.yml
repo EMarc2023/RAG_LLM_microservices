@@ -1,0 +1,38 @@
+name: Python CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    # 1. Install dependencies
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 2. Run Linting & Formatting Checks
+    - name: Run Black & Flake8 checks
+      run: |
+        pip install black flake8
+        black --check .
+        flake8 .
+
+    # 3. Run Pytest
+    - name: Run Pytest
+      run: |
+        # Create a placeholder .env file for the pipeline to run the tests
+        echo "API_KEY=SECRET_TEST_KEY_123" >> .env
+        echo "OTEL_SERVICE_NAME=CI-Test-RAG" >> .env
+        pytest -v
