@@ -1,0 +1,18 @@
+# .gitignore
+# Python Environment
+venv/
+wsl_venv/
+dlenv/
+__pycache__/
+*.pyc
+
+# Secrets and Config
+.env
+
+# Testing & Build Artifacts
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Jupyter notebook
+.ipynb

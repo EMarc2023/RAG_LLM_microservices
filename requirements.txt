@@ -1,0 +1,18 @@
+fastapi
+uvicorn
+# Testing
+pytest
+pytest-asyncio
+httpx
+# Configuration
+pydantic-settings
+# LLM & Embeddings Stack
+torch
+numpy # Added explicitly for safety
+transformers
+accelerate
+sentence-transformers
+faiss-cpu
+# Telemetry
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-grpc
