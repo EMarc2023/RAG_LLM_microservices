@@ -1,6 +1,6 @@
 # 📖 Mini RAG Pipeline: Production-Grade Retrieval-Augmented Generation (RAG) API
 
-[![Python CI/CD](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd.yml)
+[![Python CI/CD]([![Python CI (v2 Branch)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd_rag.yml/badge.svg)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd_rag.yml))
 
 ## 🚀 Overview
 
