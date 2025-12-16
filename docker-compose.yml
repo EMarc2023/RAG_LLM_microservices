@@ -1,0 +1,43 @@
+services:
+  # --- TRACING ---
+  jaeger:
+    image: jaegertracing/all-in-one:1.51
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+
+  # --- MICROSERVICES (All building from ".") ---
+  rag-service:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    # Override the CMD from the Dockerfile to run the RAG app
+    command: uvicorn rag_app:app --host 0.0.0.0 --port 8000 
+    depends_on:
+      - jaeger
+
+  llm-service:
+    build: .
+    ports:
+      - "8001:8001"
+    env_file: .env
+    # Override the CMD to run the LLM app
+    command: uvicorn llm_app:app --host 0.0.0.0 --port 8001
+    depends_on:
+      - jaeger
+
+  orchestrator:
+    build: .
+    ports:
+      - "8002:8002"
+    env_file: .env
+    # Override the CMD to run the Orchestrator app
+    command: uvicorn rag_llm_app:app --host 0.0.0.0 --port 8002
+    environment:
+      - RAG_SERVICE_URL=http://rag-service:8000
+      - LLM_SERVICE_URL=http://llm-service:8001
+    depends_on:
+      - rag-service
+      - llm-service
+      - jaeger

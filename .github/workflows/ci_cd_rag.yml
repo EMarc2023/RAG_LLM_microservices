@@ -1,0 +1,47 @@
+name: Python CI (v2 Branch)
+
+on:
+  push:
+    branches: [ "v2" ]  # Only trigger when you push to v2
+  pull_request:
+    branches: [ "v2" ]  # Only trigger for PRs targeting v2
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Optional: You can spin up Jaeger here too if your tests need it
+      jaeger:
+        image: jaegertracing/all-in-one:1.51
+        ports:
+          - 4317:4317
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgomp1
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Install torch CPU version to save time/space in CI
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest pytest-asyncio respx
+
+    - name: Run Unit Tests
+      env:
+        API_KEY: ${{ secrets.API_KEY }} # Uses GitHub Secrets for safety
+        RAG_SERVICE_URL: http://localhost:8000
+        LLM_SERVICE_URL: http://localhost:8001
+      run: |
+        pytest -v

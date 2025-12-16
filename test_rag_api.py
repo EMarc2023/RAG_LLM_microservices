@@ -4,7 +4,7 @@ import asyncio
 import json
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
-from app import app, RAGPipeline, verify_api_key, rag_resources
+from rag_app import app, RAGPipeline, verify_api_key, rag_resources
 
 SAMPLE_FILE = "sample_data.jsonl"
 SAMPLE_DOCS = [

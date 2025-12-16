@@ -1,17 +1,33 @@
+# Web & API
 fastapi
 uvicorn
-# Testing
+httpx
+
+# Testing & Mocking
 pytest
 pytest-asyncio
-httpx
+respx
+
 # Configuration
 pydantic-settings
-# LLM & Embeddings Stack
-numpy # Added explicitly for safety
-transformers
-accelerate
-sentence-transformers
-faiss-cpu
-# Telemetry
+python-dotenv
+
+# Observability & Logging
+opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-fastapi
+structlog  
+
+# AI Stack (Core)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+torchaudio
+
+# RAG & NLP
+transformers
+sentence-transformers
+faiss-cpu
+numpy
+accelerate
