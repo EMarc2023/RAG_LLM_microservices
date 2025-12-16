@@ -2,6 +2,7 @@
 fastapi
 uvicorn
 httpx
+asgi_lifespan
 
 # Testing & Mocking
 pytest

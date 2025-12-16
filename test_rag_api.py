@@ -5,6 +5,7 @@ import json
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
 from rag_app import app, RAGPipeline, verify_api_key, rag_resources
+from asgi_lifespan import LifespanManager
 
 SAMPLE_FILE = "sample_data.jsonl"
 SAMPLE_DOCS = [
@@ -51,16 +52,12 @@ async def initialize_app_lifespan():
 
 @pytest.fixture
 async def client():
-    """
-    This fixture ensures the FastAPI lifespan (startup/shutdown) 
-    runs for every test that uses the client.
-    """
-    # Entering the ASGITransport context manager triggers the lifespan!
-    async with ASGITransport(app=app) as transport:
+    # LifespanManager triggers the @asynccontextmanager lifespan in your app
+    async with LifespanManager(app) as manager:
+        # We must use manager.app to ensure the state is preserved
+        transport = ASGITransport(app=manager.app)
         async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
             yield ac
-    # After 'yield', the transport exits and triggers shutdown logic
-
 # ------------------------
 # Class-level tests
 # ------------------------
@@ -136,13 +133,15 @@ async def test_concurrent_queries():
 
 
 @pytest.mark.asyncio
-async def test_ask_endpoint(client): # Inject our new 'client' fixture
+async def test_ask_endpoint(client):
+    # Overrides still work perfectly here
     app.dependency_overrides[verify_api_key] = mock_auth_success
     
-    # Now 'client' is already pre-initialized with the RAG pipeline loaded
+    # Now the RAG Pipeline WILL be initialized
     response = await client.get("/ask", params={"query": "FastAPI"})
     
     assert response.status_code == 200
+    assert "answer" in response.json()
 
 
 @pytest.mark.asyncio
