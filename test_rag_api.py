@@ -58,6 +58,8 @@ async def client():
         transport = ASGITransport(app=manager.app)
         async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
             yield ac
+
+
 # ------------------------
 # Class-level tests
 # ------------------------
@@ -102,12 +104,12 @@ def mock_auth_failure():
 @pytest.mark.asyncio
 async def test_ask_endpoint():
     app.dependency_overrides[verify_api_key] = mock_auth_success
-    
+
     # Use 'lifespan' as a context manager to trigger startup
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://testserver"
     ) as ac:
-        # Some versions of FastAPI/Starlette require this nested block 
+        # Some versions of FastAPI/Starlette require this nested block
         # or the lifespan to be triggered via the transport
         response = await ac.get("/ask", params={"query": "FastAPI"})
         assert response.status_code == 200
@@ -116,27 +118,28 @@ async def test_ask_endpoint():
 # Optional: test multiple async calls concurrently
 # ------------------------
 @pytest.mark.asyncio
-async def test_concurrent_queries(client): # <--- Inject the fixture here
+async def test_concurrent_queries(client):  # <--- Inject the fixture here
     app.dependency_overrides[verify_api_key] = mock_auth_success
-    
+
     queries = ["FastAPI", "FAISS", "Embedding"]
     # Use the 'client' provided by the fixture instead of creating 'ac'
     tasks = [client.get("/ask", params={"query": q}) for q in queries]
-    
+
     responses = await asyncio.gather(*tasks)
-    
+
     for res in responses:
         assert res.status_code == 200
         assert "answer" in res.json()
+
 
 @pytest.mark.asyncio
 async def test_ask_endpoint(client):
     # Overrides still work perfectly here
     app.dependency_overrides[verify_api_key] = mock_auth_success
-    
+
     # Now the RAG Pipeline WILL be initialized
     response = await client.get("/ask", params={"query": "FastAPI"})
-    
+
     assert response.status_code == 200
     assert "answer" in response.json()
 
