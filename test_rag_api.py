@@ -28,7 +28,7 @@ with open(SAMPLE_FILE, "w") as f:
         f.write(json.dumps(doc) + "\n")
 
 
-@pytest_asyncio.fixture(scope="session", autouse=True)
+@pytest_asyncio.fixture
 async def initialize_app_lifespan():
     """Manually triggers the lifespan startup event for testing."""
 
