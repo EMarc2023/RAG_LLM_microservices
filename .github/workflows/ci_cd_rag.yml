@@ -71,7 +71,7 @@ jobs:
 
   docker-cd:
     name: Docker Build & Archive
-    needs: test
+    needs: Run-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
