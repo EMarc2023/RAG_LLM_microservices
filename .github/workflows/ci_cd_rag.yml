@@ -7,9 +7,33 @@ on:
     branches: [ "v2" ]  # Only trigger for PRs targeting v2
 
 jobs:
+  Lint-and-format:
+    name: Lint and Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      
+      - name: Install Linting Tools
+        run: pip install black flake8
+
+      - name: Check formatting with Black
+        run: black --check .
+
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all formatting warnings as warnings (non-blocking)
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
   Run-tests:
     runs-on: ubuntu-latest
-
+    needs: Lint-and-format
+    name: Run Unit Tests
     services:
       # Optional: You can spin up Jaeger here too if your tests need it
       jaeger:
@@ -46,29 +70,6 @@ jobs:
       run: |
         pytest -v
 
-  lint-and-format:
-    name: Lint and Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      
-      - name: Install Linting Tools
-        run: pip install black flake8
-
-      - name: Check formatting with Black
-        run: black --check .
-
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all formatting warnings as warnings (non-blocking)
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
-
   docker-cd:
     name: Docker Build & Archive
     needs: Run-tests
@@ -82,9 +83,3 @@ jobs:
       - name: Save Image as Tar
         run: docker save simple-rag-orchestrator:v2-${{ github.sha }} > orchestrator-v2.tar
 
-      - name: Upload Docker Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: orchestrator-docker-image
-          path: orchestrator-v2.tar
-          retention-days: 5
