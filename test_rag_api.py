@@ -116,21 +116,18 @@ async def test_ask_endpoint():
 # Optional: test multiple async calls concurrently
 # ------------------------
 @pytest.mark.asyncio
-async def test_concurrent_queries():
+async def test_concurrent_queries(client): # <--- Inject the fixture here
     app.dependency_overrides[verify_api_key] = mock_auth_success
-    try:
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://testserver"
-        ) as ac:
-            queries = ["FastAPI", "FAISS", "Embedding"]
-            tasks = [ac.get("/ask", params={"query": q}) for q in queries]
-            responses = await asyncio.gather(*tasks)
-            for res in responses:
-                assert res.status_code == 200
-                assert "answer" in res.json()
-    finally:
-        app.dependency_overrides = {}
-
+    
+    queries = ["FastAPI", "FAISS", "Embedding"]
+    # Use the 'client' provided by the fixture instead of creating 'ac'
+    tasks = [client.get("/ask", params={"query": q}) for q in queries]
+    
+    responses = await asyncio.gather(*tasks)
+    
+    for res in responses:
+        assert res.status_code == 200
+        assert "answer" in res.json()
 
 @pytest.mark.asyncio
 async def test_ask_endpoint(client):
