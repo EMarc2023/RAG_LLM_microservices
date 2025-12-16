@@ -49,6 +49,18 @@ async def initialize_app_lifespan():
     print("--- Shutdown Complete ---")
 
 
+@pytest.fixture
+async def client():
+    """
+    This fixture ensures the FastAPI lifespan (startup/shutdown) 
+    runs for every test that uses the client.
+    """
+    # Entering the ASGITransport context manager triggers the lifespan!
+    async with ASGITransport(app=app) as transport:
+        async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
+            yield ac
+    # After 'yield', the transport exits and triggers shutdown logic
+
 # ------------------------
 # Class-level tests
 # ------------------------
@@ -124,20 +136,13 @@ async def test_concurrent_queries():
 
 
 @pytest.mark.asyncio
-async def test_ask_endpoint_with_auth_success():
-    # 3a. Override the real dependency with the mock function
+async def test_ask_endpoint(client): # Inject our new 'client' fixture
     app.dependency_overrides[verify_api_key] = mock_auth_success
-
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://testserver"
-    ) as ac:
-        # Test normal query (no need to pass a real key, the mock handles it)
-        response = await ac.get("/ask", params={"query": "FastAPI"})
-        assert response.status_code == 200  # Should succeed
-        # You can even check the user data if the endpoint exposed it
-
-    # 3b. IMPORTANT: Clear the override after the test
-    app.dependency_overrides = {}
+    
+    # Now 'client' is already pre-initialized with the RAG pipeline loaded
+    response = await client.get("/ask", params={"query": "FastAPI"})
+    
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio
