@@ -1,7 +1,7 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
 from unittest.mock import MagicMock
-from llm_app import app, get_llm, breaker
+from microservices.llm_app import app, get_llm, breaker
 
 # 1. SETUP: Dependency Override
 # This is the "Enterprise" way to test. We replace the real model with a Mock.

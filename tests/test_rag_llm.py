@@ -2,7 +2,7 @@ import pytest
 import respx
 import httpx
 from httpx import Response
-from rag_llm_app import ask_ai, clients, settings
+from microservices.rag_llm_app import ask_ai, clients, settings
 from fastapi import HTTPException
 
 

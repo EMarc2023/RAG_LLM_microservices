@@ -13,7 +13,7 @@ services:
       - "8000:8000"
     env_file: .env
     # Override the CMD from the Dockerfile to run the RAG app
-    command: uvicorn rag_app:app --host 0.0.0.0 --port 8000 
+    command: uvicorn microservices.rag_app:app --host 0.0.0.0 --port 8000 
     depends_on:
       - jaeger
 
@@ -23,7 +23,7 @@ services:
       - "8001:8001"
     env_file: .env
     # Override the CMD to run the LLM app
-    command: uvicorn llm_app:app --host 0.0.0.0 --port 8001
+    command: uvicorn microservices.llm_app:app --host 0.0.0.0 --port 8001
     depends_on:
       - jaeger
 
@@ -33,7 +33,7 @@ services:
       - "8002:8002"
     env_file: .env
     # Override the CMD to run the Orchestrator app
-    command: uvicorn rag_llm_app:app --host 0.0.0.0 --port 8002
+    command: uvicorn microservices.rag_llm_app:app --host 0.0.0.0 --port 8002
     environment:
       - RAG_SERVICE_URL=http://rag-service:8000
       - LLM_SERVICE_URL=http://llm-service:8001
@@ -41,3 +41,11 @@ services:
       - rag-service
       - llm-service
       - jaeger
+      
+  # --- TESTING SERVICE ---   
+  tests:
+    build: .
+    # Runs pytest through the python module system to ensure paths are correct
+    command: python -m pytest tests/
+    volumes:
+      - .:/app

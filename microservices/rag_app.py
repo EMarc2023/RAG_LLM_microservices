@@ -2,6 +2,7 @@
 import json
 import asyncio
 import logging
+from pathlib import Path
 from typing import List
 from fastapi import FastAPI, HTTPException, Depends, Header, status
 from contextlib import asynccontextmanager  # ADD THIS
@@ -24,6 +25,10 @@ from opentelemetry.sdk.trace.export import (
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import faiss
+
+# Dataset path, change as necessary
+BASE_DIR = Path(__file__).resolve().parent.parent
+SAMPLE_FILE = BASE_DIR / "data" / "sample_data.jsonl"
 
 
 # Define the class (It automatically handles loading from .env)
@@ -134,7 +139,7 @@ async def lifespan(app: FastAPI):
 
     # 1. Initialize the heavy resource (RAGPipeline)
     # rag_resources["pipeline"] = RAGPipeline()
-    rag_resources["pipeline"] = RAGPipeline(dataset_path="sample_data.jsonl")
+    rag_resources["pipeline"] = RAGPipeline(dataset_path=SAMPLE_FILE)
 
     print("--- RAG Pipeline Ready ---")
     yield  # The server starts accepting requests here

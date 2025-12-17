@@ -2,12 +2,15 @@ import pytest
 import pytest_asyncio  # ADD THIS IMPORT
 import asyncio
 import json
+from pathlib import Path
 from fastapi import HTTPException
 from httpx import AsyncClient, ASGITransport
-from rag_app import app, RAGPipeline, verify_api_key, rag_resources
+from microservices.rag_app import app, RAGPipeline, verify_api_key, rag_resources
 from asgi_lifespan import LifespanManager
 
-SAMPLE_FILE = "sample_data.jsonl"
+BASE_DIR = Path(__file__).resolve().parent.parent
+SAMPLE_FILE = BASE_DIR / "data" / "sample_data.jsonl"
+
 SAMPLE_DOCS = [
     # flake8: noqa: E501
     {

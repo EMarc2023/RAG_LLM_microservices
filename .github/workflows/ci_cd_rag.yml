@@ -68,7 +68,7 @@ jobs:
         RAG_SERVICE_URL: http://localhost:8000
         LLM_SERVICE_URL: http://localhost:8001
       run: |
-        pytest -v
+        python -m pytest -v tests/
 
   docker-cd:
     name: Docker Build & Archive
