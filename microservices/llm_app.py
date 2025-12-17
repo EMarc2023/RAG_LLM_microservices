@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from transformers import pipeline
 from opentelemetry import trace
+import torch
+import re
 
 # Global Constants
 MAX_LENGTH = 50
@@ -51,10 +53,14 @@ async def lifespan(_: FastAPI):
     # STARTUP: Load model once
     logger.info("service_startup", action="loading_model")
     # flake8: noqa: E501
-    container.model = pipeline("text2text-generation", model="google/flan-t5-small")
+    # TinyLlama is a "text-generation" (Causal) model, not "text2text" (Seq2Seq)
+    container.model = pipeline(
+        "text-generation",
+        model="TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+        device=-1,  # Force CPU usage
+        dtype=torch.float32,
+    )
     yield
-    # SHUTDOWN: Cleanup
-    logger.info("service_shutdown")
     container.model = None
 
 
@@ -85,7 +91,15 @@ async def generate(prompt: str, model=Depends(get_llm)):
 
             loop = asyncio.get_event_loop()
             result = await loop.run_in_executor(
-                None, lambda: model(prompt, max_length=MAX_LENGTH)
+                None,
+                lambda: model(
+                    prompt,
+                    max_new_tokens=50,
+                    do_sample=True,
+                    temperature=0.7,
+                    pad_token_id=50256,
+                    eos_token_id=2,  # Ensures it stops at the 'End of String' token
+                ),
             )
 
             latency = time.time() - start_time
@@ -97,8 +111,27 @@ async def generate(prompt: str, model=Depends(get_llm)):
             # flake8: noqa: E501
             logger.info("inference_completed", latency=latency, prompt_size=len(prompt))
 
-            return {"response": result[0]["generated_text"]}
+            # Inside your try block in the /generate route
+            full_text = result[0]["generated_text"]
 
+            # Clean the response to get ONLY the assistant's words
+            if "<|assistant|>" in full_text:
+                final_answer = full_text.split("<|assistant|>")[-1].strip()
+            else:
+                # Fallback if the model didn't use the tag
+                final_answer = full_text.replace(prompt, "").strip()
+
+            # --- CLEANING LOGIC ---
+            # 1. Replace multiple newlines (\n\n) with a single newline or space
+            final_answer = re.sub(r"\n+", "\n", final_answer)
+
+            # 2. (Optional) If you want it all on one line, use a space instead:
+            # final_answer = re.sub(r'\s+', ' ', final_answer)
+
+            # 3. Final trim of leading/trailing whitespace
+            final_answer = final_answer.strip()
+
+            return {"response": final_answer}
         except Exception as e:
             span.record_exception(e)  # Tag the trace with the error
             span.set_status(trace.Status(trace.StatusCode.ERROR))

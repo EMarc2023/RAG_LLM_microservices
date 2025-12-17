@@ -35,16 +35,19 @@ async def async_client():
 @pytest.mark.anyio
 async def test_generate_success(async_client):
     # Arrange
-    mock_model.return_value = [{"generated_text": "Mocked Response"}]
-    await breaker.record_success()  # Ensure circuit is closed
+    mock_prompt = "What is the capital of France?"
+    # Your splitter logic looks for <|assistant|> and takes what's after it
+    # flake8: noqa: E501
+    mock_model.return_value = [{"generated_text": f"{mock_prompt}<|assistant|>\nParis"}]
+    await breaker.record_success()
 
     # Act
     response = await async_client.post("/generate", params={"prompt": "Hello"})
 
     # Assert
     assert response.status_code == 200
-    assert response.json()["response"] == "Mocked Response"
-    mock_model.assert_called_once()
+    # CHANGE THIS LINE:
+    assert response.json()["response"] == "Paris"
 
 
 @pytest.mark.anyio

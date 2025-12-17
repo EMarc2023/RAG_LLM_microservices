@@ -26,6 +26,10 @@ services:
     command: uvicorn microservices.llm_app:app --host 0.0.0.0 --port 8001
     depends_on:
       - jaeger
+    deploy:
+      resources:
+        limits:
+          memory: 4G  # Give it 4GB to be safe on a CPU
 
   orchestrator:
     build: .

@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     # STARTUP: Initialize a single, persistent client for the whole app
     # We set limits here to handle high concurrency
     limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
-    clients.http_client = httpx.AsyncClient(limits=limits, timeout=30.0)
+    clients.http_client = httpx.AsyncClient(limits=limits, timeout=90.0)
     logger.info("orchestrator_startup", status="http_client_ready")
 
     yield
@@ -97,11 +97,13 @@ async def ask_ai(request: Optional[QueryRequest] = None, query: Optional[str] = 
 
         # STEP 2: AUGMENT
         # flake8: noqa: E501
+        # The new ChatML format
         prompt = (
-            f"You are a helpful assistant. Use the following context to answer the question.\n"
-            f"Context: {context}\n"
-            f"Question: {final_query}\n"
-            f"Answer:"
+            f"<|system|>\n"
+            f"You are a helpful assistant. Use the following context to answer: {context}</s>\n"
+            f"<|user|>\n"
+            f"{final_query}</s>\n"
+            f"<|assistant|>\n"
         )
 
         # STEP 3: GENERATE (POST request to LLM)
