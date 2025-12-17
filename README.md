@@ -84,11 +84,13 @@ This codebase lays the foundation for scaling in an enterprise environment.
 To ensure this RAG-LLM pipeline is truly production-grade, we applied the following architectural principles:
 
 1. Telemetry (observability)
+
     **Purpose**: To monitor the health, performance, and behavior of the RAG pipeline in production.
     
     **Strategy**: Implement OpenTelemetry (OTel) instrumentation (for traces, metrics, and logs). This is critical for RAG to profile where latency occurs (e.g., is it the embedding model loading, the vector search, or the final LLM call?). Structured logging should be used to link error messages directly to specific request traces.
 
 2. Lifespan on FastAPI
+
     **Purpose**: Efficiently manage application resources.
     
     **Strategy**: Use the lifespan parameter with an async context manager (`@asynccontextmanager`) instead of legacy startup/shutdown events.
@@ -98,6 +100,7 @@ To ensure this RAG-LLM pipeline is truly production-grade, we applied the follow
     **Shutdown (after `yield`)**: Perform graceful cleanup, like closing database connections or releasing memory.
 
 3. Sync vs. Async (The ML Concurrency Rule)
+
     **FastAPI's strength**: Asynchronous (async def) is ideal for I/O-Bound tasks (waiting for external APIs/DBs), allowing high concurrency.
     
     **AI/ML workload challenge**: Local RAG component execution (embedding generation, local LLM inference) is CPU-Bound (heavy computation).
