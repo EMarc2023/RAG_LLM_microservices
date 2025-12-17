@@ -1,6 +1,6 @@
 # 📖 RAG-LLM microservices
 
-[![Python CI/CD]([![Python CI (v2 Branch)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd_rag.yml/badge.svg)](https://github.com/EMarc2023/Mini_RAG_pipeline/actions/workflows/ci_cd_rag.yml))
+[![Python CI (v2 Branch)](https://github.com/EMarc2023/RAG_LLM_microservices/actions/workflows/ci_cd_rag.yml/badge.svg)](https://github.com/EMarc2023/RAG_LLM_microservices/actions/workflows/ci_cd_rag.yml)
 
 ## 🚀 Overview
 
@@ -12,7 +12,7 @@ The core function is to allow users to submit queries against a pre-loaded knowl
 
 * **`microservices/rag_app.py`**: Initialises the FastAPI application, loads the RAG pipeline (vector store and embeddings), and defines the secured `/ask` endpoint for context documents retrieval.
 * **`microservices/llm_app.py`**: Initialises the LLM model (TinyLlama).
-* **`microservices/llm_app.py`**: Initialises the RAG-LLM orchestration for both RAG-based QnA.
+* **`microservices/rag_llm_app.py`**: Initialises the RAG-LLM orchestration for both RAG-based QnA.
 * **`tests`**: Contains the unit tests for each of the microservices.
 * **`docker-compose.yml`**: Contains the build instructions for each of the microservices, as well as initialises Jaeger for visualising OpenTelemetry (OTel) traces.
 * **`Dockerfile`**: Based on a slim Python image, copies dependencies, installs packages (with the CPU-only PyTorch index), and sets the startup command.
@@ -26,9 +26,34 @@ This codebase was developed with several key production-grade features and engin
 | :--- | :--- | :--- |
 | **Containerisation** | Includes `docker-compose.yml`, `Dockerfile`, and a CI/CD process to build and generate a portable Docker image artifact. | Guarantees environmental consistency across development, testing, and production (Dev/Test Parity). |
 | **API Key Security** | Implements a custom middleware/dependency to enforce authentication via an `X-API-Key` header. | Prevents unauthorised access and protects the underlying LLM/RAG resources. |
-| **Dependency Control** | Uses a dedicated `requirements.txt` and a strategic, explicit installation of **CPU-only PyTorch**. | Minimizes image size (preventing CI disk space exhaustion) and ensures compatibility with non-GPU cloud/local environments. |
+| **Dependency Control** | Uses a dedicated `requirements.txt` and a strategic, explicit installation of **CPU-only PyTorch**. | Minimises image size (preventing CI disk space exhaustion) and ensures compatibility with non-GPU cloud/local environments. |
 | **CI/CD Validation** | GitHub Actions workflow (`ci_cd.yml`) enforces linting (`black`, `flake8`), unit testing (`pytest`), and successfully generates the deployment artifact. | Ensures code quality, functionality, and automated artifact generation on every push to `main`. |
 | **Configuration** | Uses a `.env` file (or environment variables) for sensitive keys and configuration parameters (e.g., `API_KEY`, `OTEL_SERVICE_NAME`). | Decouples configuration from code for security and environment flexibility. |
+| **Resilience Patterns** | Circuit Breaker implementation on LLM calls. | Prevents cascading failures; if the LLM service is overloaded, the system fails fast and recovers gracefully. |
+
+## System Architecture
+User posts a query to the RAG-LLM orchestrator (port 8002) -> microservice calls RAG (8000) -> microservice calls LLM (8001) for question answering.
+
+graph TD
+    User((User)) -->|POST /ask_ai| Orch[Orchestrator Service<br/>Port 8002]
+    
+    subgraph "Microservices Network"
+        Orch -->|1. Get Context| RAG[RAG Service<br/>Port 8000]
+        RAG -->|Search| FAISS[(FAISS Vector DB)]
+        
+        Orch -->|2. Generate Answer| LLM[LLM Service<br/>Port 8001]
+        LLM -->|Inference| TinyLlama[TinyLlama 1.1B]
+    end
+
+    subgraph "Observability"
+        RAG -.-> Jaeger[Jaeger / OTel]
+        LLM -.-> Jaeger
+        Orch -.-> Jaeger
+    end
+
+    style Orch fill:#f9f,stroke:#333,stroke-width:2px
+    style RAG fill:#bbf,stroke:#333
+    style LLM fill:#bbf,stroke:#333
 
 ## 📈 Enterprise Scaling Considerations
 
