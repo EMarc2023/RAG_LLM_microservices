@@ -4,7 +4,7 @@
 
 ## 🚀 Overview
 
-This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)-LLM** pipeline implemented as a RESTful API using **FastAPI**. It is designed for high performance, reliability, and enterprise scalability, leveraging established Python libraries like PyTorch (CPU-only), HuggingFace Transformers, and LangChain components.
+This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)-LLM** pipeline implemented as a RESTful API using **FastAPI**. It is designed for high performance, reliability, and enterprise scalability, leveraging established Python libraries like PyTorch (CPU-only), HuggingFace Transformers, and FAISS components.
 
 The core function is to allow users to submit queries against a pre-loaded knowledge base and retrieve contextually grounded answers, ensuring minimal hallucinations and providing verifiable sources.
 
