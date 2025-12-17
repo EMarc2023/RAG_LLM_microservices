@@ -36,6 +36,11 @@ User posts a query to the RAG-LLM orchestrator (port 8002) -> microservice calls
 
 ```mermaid
 graph TD
+    %% Define a style for black text
+    classDef blackText fill:#f9f9f9,stroke:#333,stroke-width:2px,color:#000;
+    classDef orchStyle fill:#f9f,stroke:#333,stroke-width:2px,color:#000;
+    classDef serviceStyle fill:#bbf,stroke:#333,color:#000;
+
     User((User)) -->|POST /ask_ai| Orch[Orchestrator Service<br/>Port 8002]
     
     subgraph "Microservices Network"
@@ -55,6 +60,11 @@ graph TD
     style Orch fill:#bbf,stroke:#333,stroke-width:2px
     style RAG fill:#bbf,stroke:#333
     style LLM fill:#bbf,stroke:#333
+
+    %% Apply the black text classes
+    class User,FAISS,TinyLlama,Jaeger blackText;
+    class Orch orchStyle;
+    class RAG,LLM serviceStyle;
 ```
 
 ## 📈 Enterprise Scaling Considerations
