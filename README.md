@@ -52,7 +52,7 @@ graph TD
         Orch -.-> Jaeger
     end
 
-    style Orch fill:#f9f,stroke:#333,stroke-width:2px
+    style Orch fill:#bbf,stroke:#333,stroke-width:2px
     style RAG fill:#bbf,stroke:#333
     style LLM fill:#bbf,stroke:#333
 ```
