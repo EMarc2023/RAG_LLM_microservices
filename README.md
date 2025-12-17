@@ -34,6 +34,7 @@ This codebase was developed with several key production-grade features and engin
 ## System Architecture
 User posts a query to the RAG-LLM orchestrator (port 8002) -> microservice calls RAG (8000) -> microservice calls LLM (8001) for question answering.
 
+```mermaid
 graph TD
     User((User)) -->|POST /ask_ai| Orch[Orchestrator Service<br/>Port 8002]
     
@@ -54,6 +55,7 @@ graph TD
     style Orch fill:#f9f,stroke:#333,stroke-width:2px
     style RAG fill:#bbf,stroke:#333
     style LLM fill:#bbf,stroke:#333
+```
 
 ## 📈 Enterprise Scaling Considerations
 
