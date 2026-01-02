@@ -133,7 +133,7 @@ rag_resources = {}
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     # **Startup Event** (Runs once before the server accepts connections)
     print("--- Starting RAG Pipeline Initialization ---")
 

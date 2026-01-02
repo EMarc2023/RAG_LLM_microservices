@@ -8,6 +8,9 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Add CORS for frontend access if needed
+from fastapi.middleware.cors import CORSMiddleware
+
 logger = structlog.get_logger()
 
 # Config - In a real app, move these to your .env
@@ -20,7 +23,7 @@ class Settings(BaseSettings):
 
     rag_service_url: str = "http://127.0.0.1:8000"
     llm_service_url: str = "http://127.0.0.1:8001"
-    api_key: str
+    api_key: str = ""
     otel_service_name: str = "Mini-RAG-API"
 
     # NEW: Nested configuration for Pydantic Settings
@@ -46,7 +49,7 @@ clients = ServiceClients()
 
 # 2. LIFESPAN (The "Production" way)
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     # STARTUP: Initialize a single, persistent client for the whole app
     # We set limits here to handle high concurrency
     limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
@@ -61,6 +64,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Define your frontend origins
+origins = [
+    "http://localhost:5173",  # Default for Vite/React
+    "http://localhost:3000",  # Alternative React port
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, etc.
+    allow_headers=["*"],  # Allows custom headers like Content-Type
+)
 
 
 class QueryRequest(BaseModel):

@@ -58,7 +58,7 @@ async def lifespan(_: FastAPI):
         "text-generation",
         model="TinyLlama/TinyLlama-1.1B-Chat-v1.0",
         device=-1,  # Force CPU usage
-        dtype=torch.float32,
+        torch_dtype=torch.float32,
     )
     yield
     container.model = None
