@@ -121,7 +121,7 @@ async def ask_ai(request: Optional[QueryRequest] = None, query: Optional[str] = 
             f"<|user|>\n"
             f"{final_query}</s>\n"
             f"<|assistant|>\n"
-          )
+        )
 
         # STEP 3: GENERATE (POST request to LLM)
         logger.info("orchestrator_generation_start")

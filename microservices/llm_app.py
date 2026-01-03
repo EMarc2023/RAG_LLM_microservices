@@ -94,7 +94,7 @@ async def generate(prompt: str, model=Depends(get_llm)):
                 None,
                 lambda: model(
                     prompt,
-                    max_new_tokens=50,
+                    max_new_tokens=200,
                     do_sample=True,
                     temperature=0.7,
                     pad_token_id=50256,
