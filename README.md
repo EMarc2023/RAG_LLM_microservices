@@ -8,7 +8,7 @@ This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)-
 
 The core function is to allow users to submit queries against a pre-loaded knowledge base and retrieve contextually grounded answers, ensuring minimal hallucinations and providing verifiable sources.
 
-### Key Files
+### Key files
 
 * **`microservices/rag_app.py`**: Initialises the FastAPI application, loads the RAG pipeline (vector store and embeddings), and defines the secured `/ask` endpoint for context documents retrieval.
 * **`microservices/llm_app.py`**: Initialises the LLM model (TinyLlama).
@@ -18,7 +18,7 @@ The core function is to allow users to submit queries against a pre-loaded knowl
 * **`Dockerfile`**: Based on a slim Python image, copies dependencies, installs packages (with the CPU-only PyTorch index), and sets the startup command.
 * **`ci_cd_rag.yml`**: Includes critical steps like running unit tests, linting checks, and an **aggressive disk cleanup step** necessary for successfully building and saving large ML-based Docker images on GitHub Actions runners.
 
-## ✨ Production-Grade Features
+## ✨ Production-grade features
 
 This codebase was developed with several key production-grade features and engineering considerations in mind:
 
@@ -31,7 +31,7 @@ This codebase was developed with several key production-grade features and engin
 | **Configuration** | Uses a `.env` file (or environment variables) for sensitive keys and configuration parameters (e.g., `API_KEY`, `OTEL_SERVICE_NAME`). | Decouples configuration from code for security and environment flexibility. |
 | **Resilience patterns** | Circuit Breaker implementation on LLM calls. | Prevents cascading failures; if the LLM service is overloaded, the system fails fast and recovers gracefully. |
 
-## System Architecture
+## System architecture
 User posts a query to the RAG-LLM orchestrator (port 8002) -> microservice calls RAG (8000) -> microservice calls LLM (8001) for question answering.
 
 ```mermaid
@@ -67,7 +67,7 @@ graph TD
     class RAG,LLM serviceStyle;
 ```
 
-## 📈 Enterprise Scaling Considerations
+## 📈 Enterprise scaling considerations
 
 This codebase lays the foundation for scaling in an enterprise environment.
 
@@ -80,7 +80,19 @@ This codebase lays the foundation for scaling in an enterprise environment.
 | **Knowledge base updates** | Create a separate, scheduled CI/CD job to rebuild the vector store index nightly and push the updated index to S3 or a managed vector store. |
 
 
-## 💻 Advanced Engineering Considerations
+## To run the microservices
+N.B. the environmental variable with the API key is stored securely in GitHub Actions secrets. Otherwise, to run the microservices, use PowerShell or Bash shell and run the following in the root directory:
+```bash
+docker-compose up --build
+```
+One can then access the backend API endpoints.
+
+To shutdown the Docker container, run:
+```bash
+docker-compose down
+```
+
+## 💻 Advanced engineering considerations
 To ensure this RAG-LLM pipeline is truly production-grade, we applied the following architectural principles:
 
 1. Telemetry (observability)
