@@ -68,6 +68,7 @@ app = FastAPI(lifespan=lifespan)
 # Define your frontend origins
 origins = [
     "http://localhost:5173",  # Default for Vite/React
+    "http://localhost:4173",  # Alternative Vite port
     "http://localhost:3000",  # Alternative React port
 ]
 
