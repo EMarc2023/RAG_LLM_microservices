@@ -8,8 +8,9 @@ This repository hosts a production-ready **Retrieval-Augmented Generation (RAG)-
 
 The core function is to allow users to submit queries against a pre-loaded knowledge base and retrieve contextually grounded answers, ensuring minimal hallucinations and providing verifiable sources.
 
-### Key files
+## Key files
 
+* **`data/sample_data.jsonl`**: A synthetic dataset for this project.
 * **`microservices/rag_app.py`**: Initialises the FastAPI application, loads the RAG pipeline (vector store and embeddings), and defines the secured `/ask` endpoint for context documents retrieval.
 * **`microservices/llm_app.py`**: Initialises the LLM model (TinyLlama).
 * **`microservices/rag_llm_app.py`**: Initialises the RAG-LLM orchestration for both RAG-based QnA.
@@ -118,3 +119,8 @@ To ensure this RAG-LLM pipeline is truly production-grade, we applied the follow
     **AI/ML workload challenge**: Local RAG component execution (embedding generation, local LLM inference) is CPU-Bound (heavy computation).
     
     **Best practice**: The functions that execute the heavy ML inference should be defined as standard def functions. FastAPI automatically detects this and offloads the work to an internal thread pool, preventing the CPU-intensive task from blocking the main asynchronous event loop. This ensures the API remains responsive to new requests while computation is running.
+
+# Related repositories:
+Web app (React/TypeScript): https://github.com/EMarc2023/RAG_LLM_microservices_frontend
+
+Desktop client (C#/.NET 10): https://github.com/EMarc2023/RAG_LLM_microservices_desktop 
